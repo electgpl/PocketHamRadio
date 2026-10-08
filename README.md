@@ -1,5 +1,7 @@
 # Electgpl — ESP32-C5 Touch LCD 3.5" multi-app firmware
 
+[YouTube Short Link](https://youtube.com/shorts/0dwJSKxGucg?si=veyMc69ndnB2Wofq)
+
 A single-sketch Arduino firmware that exercises **every peripheral** of the
 [Waveshare ESP32-C5-Touch-LCD-3.5](https://docs.waveshare.com/ESP32-C5-Touch-LCD-3.5) board through a
 PalmOS-style launcher with **16 apps**. Among them are an AFSK 1200 / AX.25 / APRS software modem, an SSTV
