@@ -1,22 +1,42 @@
 # Electgpl — ESP32-C5 Touch LCD 3.5" multi-app firmware
 
-[YouTube Short Link](https://youtube.com/shorts/0dwJSKxGucg?si=veyMc69ndnB2Wofq)
-
 A single-sketch Arduino firmware that exercises **every peripheral** of the
 [Waveshare ESP32-C5-Touch-LCD-3.5](https://docs.waveshare.com/ESP32-C5-Touch-LCD-3.5) board through a
-PalmOS-style launcher with **16 apps**. Among them are an AFSK 1200 / AX.25 / APRS software modem, an SSTV
-receiver and transmitter, an RTTY terminal, Wi-Fi 6 / BLE / IEEE 802.15.4 / ESP-NOW radio tools, a live
-camera viewer and an audio spectrum analyzer.
+PalmOS-style launcher with **23 apps** organized in categories (ALL / HAM / RADIO / TOOLS / GAMES). Among them are an AFSK 1200 / AX.25 / APRS software modem, an SSTV
+receiver and transmitter, an RTTY terminal, Wi-Fi 6 / BLE / IEEE 802.15.4 / ESP-NOW radio tools, an ESP-NOW chat, a BLE serial terminal,
+an audio function generator, I²C and UART tools, a live camera viewer, an audio spectrum analyzer and a few games.
 
 No external libraries are needed: everything is built on the Arduino-ESP32 core and the ESP-IDF drivers
 it ships with (display driver, GUI, DSP, FFT, modems and protocol decoders are all written from scratch).
 
 > Project by **Electgpl** — electronics content on YouTube: [ELECTGPL](https://www.youtube.com/@Electgpl)
 
+## Screenshots
+
+![Overview](docs/screenshots/overview.png)
+
+<table>
+<tr><td align="center"><img src="docs/screenshots/home.png" width="160"><br><sub>Launcher (ALL)</sub></td><td align="center"><img src="docs/screenshots/home_ham.png" width="160"><br><sub>HAM category</sub></td><td align="center"><img src="docs/screenshots/sensors.png" width="160"><br><sub>SENSORS</sub></td><td align="center"><img src="docs/screenshots/audio.png" width="160"><br><sub>AUDIO</sub></td></tr>
+<tr><td align="center"><img src="docs/screenshots/camera.png" width="160"><br><sub>CAMERA</sub></td><td align="center"><img src="docs/screenshots/spectrum.png" width="160"><br><sub>SPECTRUM</sub></td><td align="center"><img src="docs/screenshots/radio_wifi.png" width="160"><br><sub>RADIO · Wi-Fi 2.4/5 GHz</sub></td><td align="center"><img src="docs/screenshots/radio_ble.png" width="160"><br><sub>RADIO · BLE</sub></td></tr>
+<tr><td align="center"><img src="docs/screenshots/radio_802154.png" width="160"><br><sub>RADIO · 802.15.4</sub></td><td align="center"><img src="docs/screenshots/radio_espnow.png" width="160"><br><sub>RADIO · ESP-NOW sniffer</sub></td><td align="center"><img src="docs/screenshots/foxhunt.png" width="160"><br><sub>FOXHUNT</sub></td><td align="center"><img src="docs/screenshots/ax25.png" width="160"><br><sub>AX.25</sub></td></tr>
+<tr><td align="center"><img src="docs/screenshots/aprs_list.png" width="160"><br><sub>APRS stations</sub></td><td align="center"><img src="docs/screenshots/aprs_map.png" width="160"><br><sub>APRS map</sub></td><td align="center"><img src="docs/screenshots/sstv.png" width="160"><br><sub>SSTV (Martin M1 RX)</sub></td><td align="center"><img src="docs/screenshots/rtty.png" width="160"><br><sub>RTTY</sub></td></tr>
+<tr><td align="center"><img src="docs/screenshots/chat.png" width="160"><br><sub>CHAT (ESP-NOW)</sub></td><td align="center"><img src="docs/screenshots/keyboard.png" width="160"><br><sub>On-screen keyboard</sub></td><td align="center"><img src="docs/screenshots/ble_term.png" width="160"><br><sub>BLE TERM</sub></td><td align="center"><img src="docs/screenshots/siggen.png" width="160"><br><sub>SIGGEN</sub></td></tr>
+<tr><td align="center"><img src="docs/screenshots/i2c.png" width="160"><br><sub>I2C tool</sub></td><td align="center"><img src="docs/screenshots/uart.png" width="160"><br><sub>UART monitor</sub></td><td align="center"><img src="docs/screenshots/pins.png" width="160"><br><sub>J3 PINS</sub></td><td align="center"><img src="docs/screenshots/settings.png" width="160"><br><sub>SETTINGS</sub></td></tr>
+<tr><td align="center"><img src="docs/screenshots/paint.png" width="160"><br><sub>PAINT</sub></td><td align="center"><img src="docs/screenshots/notes_list.png" width="160"><br><sub>NOTES</sub></td><td align="center"><img src="docs/screenshots/notes_view.png" width="160"><br><sub>NOTES viewer</sub></td><td align="center"><img src="docs/screenshots/calc.png" width="160"><br><sub>CALC</sub></td></tr>
+<tr><td align="center"><img src="docs/screenshots/tetris.png" width="160"><br><sub>TETRIS</sub></td><td align="center"><img src="docs/screenshots/maze.png" width="160"><br><sub>MAZE</sub></td><td align="center"><img src="docs/screenshots/mines.png" width="160"><br><sub>MINES</sub></td><td></td></tr>
+</table>
+
+> These images were produced by **running the firmware's own drawing code on a PC**: the sketch is compiled on the host
+> against an emulation layer whose ST7796 model rebuilds the frame from the exact SPI byte stream (`CASET`/`RASET`/`RAMWR`,
+> RGB565). Sensor values, scan results and stations are **synthetic**; the SSTV picture was decoded by the firmware from a
+> PySSTV Martin M1 signal and the RTTY text was demodulated from minimodem audio. The layout is pixel-exact; real data on
+> the board will differ.
+
 ---
 
 ## Contents
 
+- [Screenshots](#screenshots)
 - [Features](#features)
 - [Hardware](#hardware)
 - [Building](#building)
@@ -40,18 +60,26 @@ it ships with (display driver, GUI, DSP, FFT, modems and protocol decoders are a
 | **SPECTRUM** | Fixed-point 512-point FFT (Hann), 0–8 kHz spectrum with peak hold, waterfall, interpolated peak frequency |
 | **RADIO** | Wi-Fi 6 dual-band scan (2.4 + 5 GHz), BLE advertisement scan, **IEEE 802.15.4** energy-detect sweep + MAC frame sniffer, **ESP-NOW** sniffer and two-board range test |
 | **FOXHUNT** | Wi-Fi RSSI tracker on a single BSSID (promiscuous mode, ~10 samples/s), 30 s chart, Geiger-style audio |
-| **AX.25** | Software AFSK 1200 Bd (Bell 202) modem: microphone RX with TNC2-format terminal, speaker TX |
-| **APRS** | Decoder for uncompressed, compressed, Mic-E, objects, items, messages and status; station list, detail view, radar map with distance and bearing, position beacon |
+| **AX.25** | Software AFSK 1200 Bd (Bell 202) modem: microphone RX with TNC2-format terminal, speaker TX, free-text frames |
+| **APRS** | Decoder for uncompressed, compressed, Mic-E, objects, items, messages and status; station list, detail view, radar map with distance and bearing, position beacon, **APRS messaging** (send, receive, automatic ack) |
 | **SSTV** | RX with VIS auto-detection (**Robot 36, Martin M1, Scottie S1, PD 120**), per-line sync and slant correction; TX Robot 36 from the camera or a test pattern; BMP export; STOP and progress |
-| **RTTY** | ITA2 Baudot RX/TX, 45.45 / 50 / 75 Bd, 170 / 200 / 425 / 850 Hz shift, NOR/REV, waterfall tuning, CQ / RYRY / INFO macros |
+| **RTTY** | ITA2 Baudot RX/TX, 45.45 / 50 / 75 Bd, 170 / 200 / 425 / 850 Hz shift, NOR/REV, waterfall tuning, CQ / RYRY / INFO macros and free text |
+| **CHAT** | ESP-NOW text chat, **interoperable with any ESP-NOW device**: plain-text payloads are received and sent by default (optional EGCH frame with callsign and presence); broadcast or unicast to a picked or typed MAC; delivery from the radio's MAC-level ACK; RSSI per message. A minimal Serial-Monitor peer for any ESP32 is in `tools/ESPNOW_Chat_S3` |
+| **BLE TERM** | Nordic UART Service (NUS) peripheral: bidirectional terminal with nRF Connect / Serial Bluetooth Terminal |
+| **SIGGEN** | Audio function generator: sine / square / triangle / saw / noise, frequency typed 1–7900 Hz, level in dBFS, linear or log sweep, DTMF keypad |
+| **I2C** | I²C tool on the J3 header bus: i2cdetect-style map, register read (hex + ASCII dump) and write, 100/400 kHz, confirmation before writing to on-board devices |
+| **UART** | RX-only UART monitor on GPIO28 (J3 pin 21), ASCII/HEX view, autobaud from the shortest pulse |
+| **PINS** | Live view of the J3 2×16 header: EXIO8–15 as inputs or driven outputs (tap to cycle), EXIO_ADC voltage calibrated against the 3V3 pin, GPIO28 and I²C line levels, VBUS/VBAT |
+| **MINES** | Windows 95 style minesweeper: 12×14 board, 3 levels, safe first click, long-press flags, chording, smiley, counters |
 | **PAINT** | Finger painting, 10 colors, 3 brush sizes, persistent canvas, 24-bit BMP export |
-| **NOTES** | Text reader for `.txt/.md/.log/.csv` files on the microSD (built-in demo file), UTF-8 Latin folding, word wrap, drag scroll |
+| **NOTES** | Text reader for `.txt/.md/.log/.csv` files on the microSD (built-in demo file), UTF-8 Latin folding, word wrap, drag scroll; **new notes and append** with the on-screen keyboard |
 | **CALC** | Four-function calculator with %, ±, backspace and chained operations |
 | **TETRIS** | 7-bag randomizer, ghost piece, wall kicks, levels, auto-repeat controls |
 | **MAZE** | Tilt maze driven by the IMU, with a 3-step axis-mapping wizard, filtered physics and random perfect mazes |
 | **SETTINGS** | Persistent settings in NVS: backlight, sleep, volume, mic gain, AX.25 callsign/SSID, camera flip, **date/time with NTP sync** (on-screen QWERTY keyboard for the Wi-Fi password), time zone |
 
 **System-wide**
+- **Shared on-screen keyboard**: QWERTY with shift and two symbol layers, forced upper-case mode, decimal and hexadecimal keypads.
 - Header with clock and smartphone-style battery icon (percentage and charging bolt).
 - **Navigation:** BOOT short press = HOME, PWR short press = BACK, BOOT long press = backlight, tapping the logo = HOME.
 - **Battery management:** on battery the backlight drops to a minimum, and after an idle timeout the board enters ESP32-C5 deep sleep (wake by touch or RESET) or AXP2101 power-off (wake by PWR or USB).
@@ -99,10 +127,10 @@ As an alternative to Huge APP: Flash Size **16MB** with the partition scheme **1
 ### Steps
 
 1. Clone the repository.
-2. Open `C5_LCD35_Electgpl_v9/C5_LCD35_Electgpl_v9.ino`. The folder name must match the sketch name.
+2. Open `C5_LCD35_Electgpl_v12/C5_LCD35_Electgpl_v12.ino`. The folder name must match the sketch name.
 3. Select the board options above and upload.
 
-The binary is about 1.7 MB (54 % of the Huge APP partition).
+The binary is about 1.77 MB (56 % of the Huge APP partition).
 
 ### Before transmitting
 
@@ -125,6 +153,29 @@ you hold the appropriate license.
 - **Serial monitor** (115200 Bd): startup status line, decoded AX.25/APRS frames, scan results and diagnostics.
 
 ---
+
+## J3 header (2×16)
+
+| Pin | Signal | Pin | Signal |
+|---|---|---|---|
+| 1 | VBUS | 2 | VBAT |
+| 3 | GND | 4 | GND |
+| 5 | SWDIO (CH32V006) | 6 | EXIO8 |
+| 7 | NC | 8 | EXIO9 |
+| 9 | NC | 10 | EXIO10 |
+| 11 | NC / GPIO22 (C6 variant only) | 12 | EXIO11 |
+| 13 | NC / GPIO21 (C6 variant only) | 14 | EXIO12 |
+| 15 | GPIO0 (0R selector, camera D0 by default) | 16 | EXIO13 |
+| 17 | GPIO1 (0R selector, camera D1 by default) | 18 | EXIO14 |
+| 19 | GPIO9 (0R selector, SD CS by default) | 20 | EXIO15 |
+| 21 | **GPIO28** (BOOT, free input) | 22 | CHIP_PU (reset) |
+| 23 | EXIO_ADC | 24 | PWRON (AXP2101 key) |
+| 25 | I²C SCL (GPIO26, on-board bus) | 26 | U0TXD (0R selector, camera PCLK by default) |
+| 27 | I²C SDA (GPIO27, on-board bus) | 28 | U0RXD (0R selector, camera VSYNC by default) |
+| 29 | GND | 30 | GND |
+| 31 | 3V3 | 32 | 3V3 |
+
+All signals are 3.3 V logic. EXIO8–15 and EXIO_ADC belong to the CH32V006 expander (I²C 0x24).
 
 ## Pin map
 
@@ -176,6 +227,9 @@ Modems and decoders were tested on a host against **independent implementations*
 | FFT | Analytic signals | Frequency error < 0.5 Hz, on-bin amplitude ±0.05 dB |
 | IEEE 802.15.4 | Crafted MAC frames | ACK, data (short/extended), beacon and MAC command decoded correctly |
 | Maze physics | 20 000 random-tilt steps | No wall penetration, 200 generated mazes all perfect |
+| Function generator | Goertzel / RMS | Levels match theory (sine −3.01 dB, square 0 dB, triangle −4.77 dB RMS); DTMF exact; log sweep exact |
+| Minesweeper | 2 000 simulated games (AddressSanitizer) | Safe first click, flood fill, win detection and chording correct, no memory errors |
+| APRS messaging | APRS101 format | Messages to own SSID acknowledged (`:CALL     :ackNN`), others ignored |
 
 ---
 
@@ -186,6 +240,8 @@ Modems and decoders were tested on a host against **independent implementations*
 - **Robot 36 chroma** is decoded at 160 px: at 16 kHz, 320 px would be 2.2 samples per pixel, beyond the FM
   discriminator bandwidth.
 - **ESP-NOW** tools operate on 2.4 GHz only.
+- **UART monitor** is RX-only: the only free ESP32 GPIO on J3 is GPIO28 on pin 21 (BOOT strap, keep it high at reset). UART TX/RX on J3
+  (U0TXD/U0RXD) are routed to the camera by 0R selectors; a passive I²C sniffer is not possible for the same reason.
 - **The Wi-Fi password** is stored in NVS without encryption (default ESP32 behavior).
 - **Do not use `C5_BF3901_Camera`** (the Arduino camera library in the Waveshare repository) on this board:
   its pin mapping belongs to different hardware and drives GPIO0 against the sensor output.
@@ -197,12 +253,14 @@ Modems and decoders were tested on a host against **independent implementations*
 ```
 .
 ├── README.md
-├── C5_LCD35_Electgpl_v9/
-│   ├── C5_LCD35_Electgpl_v9.ino      main sketch (~4000 lines)
+├── tools/ESPNOW_Chat_S3/ESPNOW_Chat_S3.ino   plain-text ESP-NOW chat for any ESP32 (Serial Monitor)
+├── C5_LCD35_Electgpl_v12/
+│   ├── C5_LCD35_Electgpl_v12.ino      main sketch (~5300 lines)
 │   ├── font8x13.h                    8x13 bitmap font (X11 Misc-Fixed, public domain)
 │   └── bf3901_init.h                 BF3901 register table (Espressif, Apache-2.0)
 └── docs/
-    └── KNOWLEDGE_BASE_ESP32-C5-Touch-LCD-3.5.md
+    ├── KNOWLEDGE_BASE_ESP32-C5-Touch-LCD-3.5.md
+    └── screenshots/                  31 app screens + overview.png
 ```
 
 ---
